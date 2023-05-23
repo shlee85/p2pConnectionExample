@@ -71,65 +71,6 @@ class MainActivity : AppCompatActivity() {
 
         permissionCheck()
 
-        binding.startActivity.setOnClickListener {
-            Log.d(TAG, "go Sub Activity [${p2pList[0].name}]")
-            putDeviceInfo.add(p2pList[0])
-
-            val intent = Intent(this@MainActivity, SubActivity::class.java)
-            Log.d(TAG, "push intent [${putDeviceInfo[0]}]")
-
-            //intent.putExtra("testSubActivity", putDeviceInfo)
-            intent.putExtra("testSubActivity", "")
-            startActivity(intent)
-            Log.d(TAG, "Success!! intent")
-        }
-
-        /*
-        /* p2p 객체 생성 */
-        p2pClient = WifiDirect(this@MainActivity)
-        Log.d(TAG, "p2pClient addr = $p2pClient")
-        //p2pObject.add(p2pClient)
-        p2pClient?.setListener(object: WifiDirect.OnListener {
-            override fun onConnecting() {
-                TODO("Not yet implemented")
-            }
-
-            override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
-                Log.d(TAG, "onConnected!!!")
-            }
-
-            override fun onWifiOff(str: String) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onDiscoverService(p2plist: ArrayList<WifiDirect.P2PList>) {
-                Log.d(TAG, "onDiscoverService")
-                p2plist.forEach {
-                    Log.d(TAG, "${it.name} : ${it.address}")
-
-                    /* WIFI가 로와시스 디바이스만 저장 */
-                    if(it.name.contains("LOWASIS")) {
-                        p2pList.add(P2PList(it.name, it.address))
-                    }
-                }
-            }
-
-            override fun onGroupInfo() {
-                TODO("Not yet implemented")
-            }
-        })
-
-        //p2p실행.
-        binding.p2plist.setOnClickListener {
-            Log.d(TAG, "P2p 리스트 조회")
-            p2pClient?.p2pStart(false) //리스트 요청.
-        }
-
-        binding.p2pconnect.setOnClickListener {
-            Log.d(TAG, "P2p 연결 (첫번째 들어온데이터 강제연결 - 테스트용도)")
-            p2pClient?.p2pConnect(p2pList[0].name, p2pList[0].address)
-        }
-        */
     }
 
     override fun onStart() {
@@ -143,7 +84,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
-                Log.d(TAG, "연결 완료!")
+                Log.d(TAG, "연결 완료! Go SubActivity!!")
+                moveSubActivity()
             }
 
             override fun onWifiOff(str: String) {
@@ -178,11 +120,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "P2P 리스트 조회")
             WifiDirectSingleton.getInstance()?.p2pStart(false)
         }
-
-//        binding.p2pconnect.setOnClickListener {
-//            Log.d(TAG, "P2P 연결")
-//            WifiDirectSingleton.getInstance()?.p2pConnect(p2pList[0].name, p2pList[0].address)
-//        }
     }
 
     private fun p2pListRecyclerView(p2pList: ArrayList<P2pDevice>) {
@@ -200,6 +137,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun moveSubActivity() {
+        val intent = Intent(this@MainActivity, SubActivity::class.java)
+        intent.putExtra("subActivity", "")
+        startActivity(intent)
     }
 
     companion object {
