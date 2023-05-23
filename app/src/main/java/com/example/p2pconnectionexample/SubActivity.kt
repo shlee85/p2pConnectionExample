@@ -9,11 +9,18 @@ import com.google.gson.Gson
 import java.io.ByteArrayInputStream
 import java.io.ObjectInputStream
 import java.io.Serializable
+import java.net.InetAddress
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.Timer
+import kotlin.concurrent.timer
 
 class SubActivity : AppCompatActivity() {
     lateinit var binding: ActivitySubBinding
+    private var ipAddress: String? = ""
 
-    var p2pClientTemp : WifiDirect? = null
+    private var pingCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,15 +29,16 @@ class SubActivity : AppCompatActivity() {
 
         Log.d(TAG, "Sub Activity")
         val intent = intent
-        val info = intent.getSerializableExtra("testSubActivity")
-        Log.d(TAG, "info -> ${info}, p2pClientTemp = $p2pClientTemp")
+        val info = intent.getStringExtra("subActivity")
+        ipAddress = info
+        Log.d(TAG, "info = $ipAddress")
 
-        //Log.d(TAG, "${intent.getStringExtra("testSubActivity")}")
+        if(ipAddress != "") pingTest()
 
         //객체를 전달 받아서 Disconnect 해보자.
         binding.p2pdisconnect.setOnClickListener {
             Log.d(TAG, "P2P Disconnect")
-            WifiDirectSingleton.getInstance()?.p2pDisconnect()
+            releaseP2p()
         }
 
         WifiDirectSingleton.getInstance()?.setListener(object : WifiDirectSingleton.OnListener{
@@ -38,7 +46,7 @@ class SubActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
 
-            override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
+            override fun onConnected(ip: String, reachable: Boolean, deviceName: String) {
                 Log.d(TAG, "연결 완료!")
             }
 
@@ -68,6 +76,43 @@ class SubActivity : AppCompatActivity() {
         val intent = Intent(this@SubActivity, MainActivity::class.java)
         intent.putExtra("goMainActivity", "")
         startActivity(intent)
+    }
+
+    private fun releaseP2p() {
+        testPingService?.cancel()
+        WifiDirectSingleton.getInstance()?.p2pDisconnect()
+    }
+
+    private var testPingService: Timer? = null // 테스트용 핑
+    private fun pingTest() {
+        if (testPingService == null) { // 이 타이머는 서버와의 연결 확인 테스트 용임
+            testPingService = timer(period = 1000, initialDelay = 1000)
+            {
+                try {
+                    val address: InetAddress = InetAddress.getByName(ipAddress)
+                    val reachable: Boolean = address.isReachable(1000)
+                    val currentTime = SimpleDateFormat(
+                        "hh:mm:ss",
+                        Locale.getDefault()
+                    ).format(Date(System.currentTimeMillis()))
+                    val strText = "$currentTime  ping:$reachable"
+                    if(!reachable){
+                        pingCount++
+                    } else {
+                        pingCount = 0
+                    }
+
+                    if(pingCount > 5) {
+                        Log.d(TAG, "연결 끊김. 연결을 해제 합니다.")
+                        releaseP2p()
+                    }
+
+                    Log.i(TAG, strText)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     companion object {

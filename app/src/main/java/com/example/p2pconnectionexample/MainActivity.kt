@@ -83,9 +83,9 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
 
-            override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
-                Log.d(TAG, "연결 완료! Go SubActivity!!")
-                moveSubActivity()
+            override fun onConnected(ip: String, reachable: Boolean, deviceName: String) {
+                Log.d(TAG, "연결 완료! Go SubActivity!!, ip = $ip")
+                moveSubActivity(ip)
             }
 
             override fun onWifiOff(str: String) {
@@ -139,9 +139,9 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun moveSubActivity() {
+    private fun moveSubActivity(ip: String) {
         val intent = Intent(this@MainActivity, SubActivity::class.java)
-        intent.putExtra("subActivity", "")
+        intent.putExtra("subActivity", ip)
         startActivity(intent)
     }
 

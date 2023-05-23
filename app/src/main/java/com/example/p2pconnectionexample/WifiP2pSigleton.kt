@@ -59,6 +59,8 @@ class WifiDirectSingleton() :
     private var mDeviceName: String = ""
     private var mDeviceAddress: String = ""
 
+    private var ipAddress: String = ""
+
     data class P2PList(val name: String, val address: String)
     private var p2plist: ArrayList<P2PList> = ArrayList()
 
@@ -99,8 +101,9 @@ class WifiDirectSingleton() :
                         Log.d(TAG, "P2P_HANDLER_MSG_STATE_CONNECTED")
                         Log.d(TAG, "msgObj -> ${msg.obj} ")
 
+                        ipAddress = msg.obj.toString()
                         stopDiscoveryPeer()
-                        mListener?.onConnected(null, true, "null")
+                        mListener?.onConnected(ipAddress, true, "null")
                     }
                     P2P_HANDLER_MSG_STATE_DISCONNECT -> {
                         Log.d(TAG, "P2P_HANDLER_MSG_STATE_DISCONNECT")
@@ -325,7 +328,6 @@ class WifiDirectSingleton() :
         }
     }
 
-
     override fun onConnectionInfoAvailable(p0: WifiP2pInfo?) {
         Log.d(TAG, "onConnectionInfoAvailable()")
     }
@@ -333,7 +335,7 @@ class WifiDirectSingleton() :
     private var mListener: WifiDirectSingleton.OnListener?= null
     interface OnListener {
         fun onConnecting()
-        fun onConnected(ip: String?, reachable: Boolean, deviceName: String)
+        fun onConnected(ip: String, reachable: Boolean, deviceName: String)
         fun onWifiOff(str: String)
         fun onDiscoverService(p2plist: ArrayList<P2PList>)
         fun onGroupInfo()
