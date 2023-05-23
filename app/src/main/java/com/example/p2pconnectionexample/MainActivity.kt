@@ -7,6 +7,8 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.p2pconnectionexample.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import java.io.Serializable
@@ -15,6 +17,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
     var p2pClient : WifiDirect ?= null
+
+    var p2pList : ArrayList<P2PList> = ArrayList()
+    var putDeviceInfo : ArrayList<P2PList> = ArrayList()
+
+
+    private lateinit var adapter: P2pListAdapter
+    private var pList = arrayListOf<P2pDevice>()
 
     data class P2PList(val name: String, val address: String) : Serializable
 
@@ -54,9 +63,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Permission 확인")
         }
     }
-
-    var p2pList : ArrayList<P2PList> = ArrayList()
-    var putDeviceInfo : ArrayList<P2PList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,14 +152,17 @@ class MainActivity : AppCompatActivity() {
 
             override fun onDiscoverService(p2plist: ArrayList<WifiDirectSingleton.P2PList>) {
                 Log.d(TAG, "onDiscoverService")
+                pList.clear()
                 p2plist.forEach {
                     Log.d(TAG, "${it.name} : ${it.address}")
-
-                    /* WIFI가 로와시스 디바이스만 저장 */
-                    if(it.name.contains("LOWASIS")) {
-                        p2pList.add(P2PList(it.name, it.address))
-                    }
+                    p2pList.add(P2PList(it.name, it.address))
                 }
+
+                p2plist.distinct().forEach {
+                    pList.add(P2pDevice(it.name, it.address))
+                }
+
+                p2pListRecyclerView(pList)
             }
 
             override fun onGroupInfo() {
@@ -170,10 +179,27 @@ class MainActivity : AppCompatActivity() {
             WifiDirectSingleton.getInstance()?.p2pStart(false)
         }
 
-        binding.p2pconnect.setOnClickListener {
-            Log.d(TAG, "P2P 연결")
-            WifiDirectSingleton.getInstance()?.p2pConnect(p2pList[0].name, p2pList[0].address)
-        }
+//        binding.p2pconnect.setOnClickListener {
+//            Log.d(TAG, "P2P 연결")
+//            WifiDirectSingleton.getInstance()?.p2pConnect(p2pList[0].name, p2pList[0].address)
+//        }
+    }
+
+    private fun p2pListRecyclerView(p2pList: ArrayList<P2pDevice>) {
+        binding.p2plistRecyclerview.layoutManager = LinearLayoutManager(AT3App.context)
+        adapter = P2pListAdapter(AT3App.context!!, pList)
+        binding.p2plistRecyclerview.adapter = adapter
+
+        adapter.setMyItemClickListener(object : P2pListAdapter.MyItemClickListener {
+            override fun onItemClick(pos: Int, name: String?) {
+                Log.d(WifiDirectSingleton.TAG, " P2P 선택!![$pos : $name]")
+                p2pList.forEach { p2p ->
+                    if(p2p.name == name) {
+                        WifiDirectSingleton.getInstance()?.p2pConnect(p2p.name,p2p.address)
+                    }
+                }
+            }
+        })
     }
 
     companion object {

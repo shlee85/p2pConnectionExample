@@ -16,6 +16,8 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class WifiDirectSingleton() :
     ConnectionInfoListener, Thread() {
@@ -56,6 +58,9 @@ class WifiDirectSingleton() :
 
     private var mDeviceName: String = ""
     private var mDeviceAddress: String = ""
+
+    data class P2PList(val name: String, val address: String)
+    private var p2plist: ArrayList<P2PList> = ArrayList()
 
     init {
         p2pManager = AT3App.context?.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager?
@@ -194,13 +199,14 @@ class WifiDirectSingleton() :
         })
     }
 
-    data class P2PList(val name: String, val address: String)
-    private var p2plist: ArrayList<P2PList> = ArrayList()
-
     private val peerListListener = WifiP2pManager.PeerListListener { peerList ->
+        p2plist.clear()   //peerList가 호출 될 때 기존에 쌓은 데이터는 제거 하고 다시 처음부터 쌓는다.
+
         peerList.deviceList.forEach {
             Log.d(TAG, "List : ${it.deviceName}, ${it.deviceAddress}")
-            p2plist.add(P2PList(it.deviceName, it.deviceAddress))
+            if(it.deviceName.contains("LOWASIS")) {
+                p2plist.add(P2PList(it.deviceName, it.deviceAddress))
+            }
         }
         Log.d(TAG, "......................")
         mListener?.onDiscoverService(p2plist)
@@ -318,6 +324,7 @@ class WifiDirectSingleton() :
             }
         }
     }
+
 
     override fun onConnectionInfoAvailable(p0: WifiP2pInfo?) {
         Log.d(TAG, "onConnectionInfoAvailable()")
