@@ -58,10 +58,6 @@ class MainActivity : AppCompatActivity() {
     var p2pList : ArrayList<P2PList> = ArrayList()
     var putDeviceInfo : ArrayList<P2PList> = ArrayList()
 
-
-    data class P2PObject(val p2pCli:WifiDirect?) : Serializable
-    var p2pObject: ArrayList<P2PObject?> = ArrayList()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -77,16 +73,12 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "push intent [${putDeviceInfo[0]}]")
 
             //intent.putExtra("testSubActivity", putDeviceInfo)
-            val data = P2PObject(p2pClient)
-            Log.d(TAG, "p2pClient = $p2pClient, data = $data")
-
-            intent.putExtra("testSubActivity", data)
-            Log.d(TAG, "111111111")
+            intent.putExtra("testSubActivity", "")
             startActivity(intent)
             Log.d(TAG, "Success!! intent")
         }
 
-
+        /*
         /* p2p 객체 생성 */
         p2pClient = WifiDirect(this@MainActivity)
         Log.d(TAG, "p2pClient addr = $p2pClient")
@@ -130,6 +122,57 @@ class MainActivity : AppCompatActivity() {
         binding.p2pconnect.setOnClickListener {
             Log.d(TAG, "P2p 연결 (첫번째 들어온데이터 강제연결 - 테스트용도)")
             p2pClient?.p2pConnect(p2pList[0].name, p2pList[0].address)
+        }
+        */
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart()!!")
+
+        WifiDirectSingleton.setInstance(WifiDirectSingleton())
+        WifiDirectSingleton.getInstance()?.setListener(object : WifiDirectSingleton.OnListener{
+            override fun onConnecting() {
+                TODO("Not yet implemented")
+            }
+
+            override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
+                Log.d(TAG, "연결 완료!")
+            }
+
+            override fun onWifiOff(str: String) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDiscoverService(p2plist: ArrayList<WifiDirectSingleton.P2PList>) {
+                Log.d(TAG, "onDiscoverService")
+                p2plist.forEach {
+                    Log.d(TAG, "${it.name} : ${it.address}")
+
+                    /* WIFI가 로와시스 디바이스만 저장 */
+                    if(it.name.contains("LOWASIS")) {
+                        p2pList.add(P2PList(it.name, it.address))
+                    }
+                }
+            }
+
+            override fun onGroupInfo() {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDisconnected() {
+                Log.d(TAG, "onDisconnected!!")
+            }
+        })
+
+        binding.p2plist.setOnClickListener {
+            Log.d(TAG, "P2P 리스트 조회")
+            WifiDirectSingleton.getInstance()?.p2pStart(false)
+        }
+
+        binding.p2pconnect.setOnClickListener {
+            Log.d(TAG, "P2P 연결")
+            WifiDirectSingleton.getInstance()?.p2pConnect(p2pList[0].name, p2pList[0].address)
         }
     }
 

@@ -24,15 +24,50 @@ class SubActivity : AppCompatActivity() {
         val intent = intent
         val info = intent.getSerializableExtra("testSubActivity")
         Log.d(TAG, "info -> ${info}, p2pClientTemp = $p2pClientTemp")
-        if(p2pClientTemp == info) {
-            Log.d(TAG, "같다!!!!!")
-        }
+
         //Log.d(TAG, "${intent.getStringExtra("testSubActivity")}")
 
         //객체를 전달 받아서 Disconnect 해보자.
         binding.p2pdisconnect.setOnClickListener {
             Log.d(TAG, "P2P Disconnect")
+            WifiDirectSingleton.getInstance()?.p2pDisconnect()
         }
+
+        WifiDirectSingleton.getInstance()?.setListener(object : WifiDirectSingleton.OnListener{
+            override fun onConnecting() {
+                TODO("Not yet implemented")
+            }
+
+            override fun onConnected(ip: String?, reachable: Boolean, deviceName: String) {
+                Log.d(TAG, "연결 완료!")
+            }
+
+            override fun onWifiOff(str: String) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDiscoverService(p2plist: ArrayList<WifiDirectSingleton.P2PList>) {
+                Log.d(TAG, "onDiscoverService")
+                p2plist.forEach {
+                    Log.d(TAG, "${it.name} : ${it.address}")
+                }
+            }
+
+            override fun onGroupInfo() {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDisconnected() {
+                Log.d(TAG, "onDisconnected!!")
+                goMainActivity()
+            }
+        })
+    }
+
+    private fun goMainActivity() {
+        val intent = Intent(this@SubActivity, MainActivity::class.java)
+        intent.putExtra("goMainActivity", "")
+        startActivity(intent)
     }
 
     companion object {
