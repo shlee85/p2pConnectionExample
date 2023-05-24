@@ -16,8 +16,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.p2pconnectionexample.SharedPreference.latest_p2p_device
 
 class WifiDirectSingleton() :
     ConnectionInfoListener, Thread() {
@@ -102,6 +101,7 @@ class WifiDirectSingleton() :
                         Log.d(TAG, "msgObj -> ${msg.obj} ")
 
                         ipAddress = msg.obj.toString()
+                        latest_p2p_device = mDeviceName //현재 연결이 완료된 device 이름 저장.
                         stopDiscoveryPeer()
                         mListener?.onConnected(ipAddress, true, "null")
                     }

@@ -1,8 +1,10 @@
 package com.example.p2pconnectionexample
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.p2pconnectionexample.databinding.P2plistRecyclerviewThemeBinding
@@ -26,9 +28,15 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
     inner class MainViewHolder(private val binding: P2plistRecyclerviewThemeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: P2pDevice) {
             binding.model = item
+            if(item.name == SharedPreference.latest_p2p_device) {
+                Log.d(TAG, "최근에 업데이트한 내용이 있음.[${item.name}]")
+                binding.icConn.visibility = View.VISIBLE
+            }
+            Log.d(TAG, "item = ${item.name}")
 
             this.itemView.setOnClickListener {
                 Log.d(TAG, "SetOnClick pos = $adapterPosition")
+                this.itemView.setBackgroundColor(Color.parseColor("#aaaaaa"))
                 mItemClickListener?.onItemClick(adapterPosition, item.name)
             }
         }

@@ -116,10 +116,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.p2plist.setOnClickListener {
-            Log.d(TAG, "P2P 리스트 조회")
-            WifiDirectSingleton.getInstance()?.p2pStart(false)
-        }
+        //MainActivity에서는 무조건 peer검색요청 한다.
+        WifiDirectSingleton.getInstance()?.p2pStart(false)
     }
 
     private fun p2pListRecyclerView(p2pList: ArrayList<P2pDevice>) {

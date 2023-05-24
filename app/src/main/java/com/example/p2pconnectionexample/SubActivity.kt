@@ -96,6 +96,7 @@ class SubActivity : AppCompatActivity() {
                         Locale.getDefault()
                     ).format(Date(System.currentTimeMillis()))
                     val strText = "$currentTime  ping:$reachable"
+                    runOnUiThread { binding.pingView.text = strText }
                     if(!reachable){
                         pingCount++
                     } else {

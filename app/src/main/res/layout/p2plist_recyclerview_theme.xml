@@ -14,18 +14,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="1dp"
-        android:background="#80000000">
+        android:background="#EEEEEE">
+
+        <ImageView
+            android:id="@+id/ic_p2p"
+            android:layout_width="70dp"
+            android:layout_height="47dp"
+            android:background="@drawable/ic_wifi"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/mP2pList"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@{model.name}"
-            android:textColor="#ffffff"
-            android:textSize="30sp"
-            android:layout_marginStart="5dp"
+            android:textColor="@color/black"
+            android:textSize="35sp"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintStart_toEndOf="@id/ic_p2p"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="" />
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout_editor_absoluteX="16dp"
+            tools:text="123456" />
+
+        <ImageView
+            android:id="@+id/ic_conn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_connect"
+            android:layout_marginLeft="10dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/mP2pList"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
