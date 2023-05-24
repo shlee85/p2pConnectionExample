@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.p2pconnectionexample.databinding.ActivityMainBinding
@@ -127,9 +128,10 @@ class MainActivity : AppCompatActivity() {
 
         adapter.setMyItemClickListener(object : P2pListAdapter.MyItemClickListener {
             override fun onItemClick(pos: Int, name: String?) {
-                Log.d(WifiDirectSingleton.TAG, " P2P 선택!![$pos : $name]")
+                Log.d(TAG, " P2P 선택!![$pos : $name]")
                 p2pList.forEach { p2p ->
                     if(p2p.name == name) {
+                        connectionDialog("연결 중입니다. 잠시만 기다리세요.")
                         WifiDirectSingleton.getInstance()?.p2pConnect(p2p.name,p2p.address)
                     }
                 }
@@ -137,11 +139,22 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun connectionDialog(message: String) {
+        val builder = AlertDialog.Builder(this)
+        //val dialog = builder.create()
+        builder.setTitle("Wi-Fi P2P")
+        builder.setMessage(message)
+        builder.show()
+        //dialog.show()
+    }
+
     private fun moveSubActivity(ip: String) {
         val intent = Intent(this@MainActivity, SubActivity::class.java)
         intent.putExtra("subActivity", ip)
         startActivity(intent)
     }
+
+
 
     companion object {
         val TAG = MainActivity::class.java.simpleName

@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.example.p2pconnectionexample.SharedPreference.latest_p2p_device
 
+
 class WifiDirectSingleton() :
     ConnectionInfoListener, Thread() {
     companion object {
@@ -143,7 +144,18 @@ class WifiDirectSingleton() :
 
         p2pBroadcastReceiver = object : BroadcastReceiver(){
             override fun onReceive(context: Context?, intent: Intent?) {
-                Log.d(TAG, "BroadcastReceiver() onReceive")
+                Log.d(TAG, "BroadcastReceiver() onReceive ${intent}")
+                //intent!!.
+//                val bundle = intent!!.extras
+//                if (bundle != null) {
+//                    for (key in bundle.keySet()) {
+//                        Log.e(
+//                            TAG, "$key : " + if (bundle[key]
+//                                != null
+//                            ) bundle[key] else "NULL"
+//                        )
+//                    }
+//                }
 
                 when(intent?.action) {
                     WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
