@@ -8,25 +8,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.p2pconnectionexample.databinding.ActivityMainBinding
-import com.google.gson.Gson
 import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
-    var p2pClient : WifiDirect ?= null
-
     var p2pList : ArrayList<P2PList> = ArrayList()
-    var putDeviceInfo : ArrayList<P2PList> = ArrayList()
+    private var p2pData : ArrayList<String> = ArrayList()
 
+    private var mDeviceName = ""
 
     private lateinit var adapter: P2pListAdapter
-    private var pList = arrayListOf<P2pDevice>()
-
-    data class P2PList(val name: String, val address: String) : Serializable
+    //private var pList = arrayListOf<P2pDevice>()
+    private var pList = ArrayList<P2pDevice>()
 
     private fun permissionCheck() {
         if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -93,19 +90,19 @@ class MainActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
 
-            override fun onDiscoverService(p2plist: ArrayList<WifiDirectSingleton.P2PList>) {
+            override fun onDiscoverService(peers: ArrayList<P2pDevice>) {
                 Log.d(TAG, "onDiscoverService")
-                pList.clear()
-                p2plist.forEach {
-                    Log.d(TAG, "${it.name} : ${it.address}")
-                    p2pList.add(P2PList(it.name, it.address))
-                }
+//                pList.clear()
+//                peers.forEach {
+//
+//                    Log.d(TAG, "pList Size = ${pList.size}")
+//                    pList.add(P2pDevice(it.name, it.address))
+//                }
+//
+//                p2pListRecyclerView()
 
-                p2plist.distinct().forEach {
-                    pList.add(P2pDevice(it.name, it.address))
-                }
 
-                p2pListRecyclerView(pList)
+                peerData(peers)
             }
 
             override fun onGroupInfo() {
@@ -115,23 +112,31 @@ class MainActivity : AppCompatActivity() {
             override fun onDisconnected() {
                 Log.d(TAG, "onDisconnected!!")
             }
+
+            override fun onConnectFail() {
+                Log.d(TAG, "onConnect Fail. [ $mDeviceName ], dialog = $dialog")
+                showDialogMessage(DIALOG_CONNECTING_FAIL)
+            }
         })
 
         //MainActivity에서는 무조건 peer검색요청 한다.
         WifiDirectSingleton.getInstance()?.p2pStart(false)
+
+        p2pListRecyclerView()
     }
 
-    private fun p2pListRecyclerView(p2pList: ArrayList<P2pDevice>) {
+    private fun p2pListRecyclerView() {
         binding.p2plistRecyclerview.layoutManager = LinearLayoutManager(AT3App.context)
         adapter = P2pListAdapter(AT3App.context!!, pList)
         binding.p2plistRecyclerview.adapter = adapter
 
         adapter.setMyItemClickListener(object : P2pListAdapter.MyItemClickListener {
             override fun onItemClick(pos: Int, name: String?) {
-                Log.d(TAG, " P2P 선택!![$pos : $name]")
-                p2pList.forEach { p2p ->
+                Log.d(TAG, "P2P 선택!![$pos : $name]")
+                pList.forEach { p2p ->
                     if(p2p.name == name) {
-                        connectionDialog("연결 중입니다. 잠시만 기다리세요.")
+                        mDeviceName = p2p.name
+                        showDialogMessage(DIALOG_CONNECTING)
                         WifiDirectSingleton.getInstance()?.p2pConnect(p2p.name,p2p.address)
                     }
                 }
@@ -139,13 +144,32 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun connectionDialog(message: String) {
-        val builder = AlertDialog.Builder(this)
-        //val dialog = builder.create()
-        builder.setTitle("Wi-Fi P2P")
-        builder.setMessage(message)
-        builder.show()
-        //dialog.show()
+    private lateinit var builder: AlertDialog.Builder
+    private lateinit var dialog: AlertDialog
+
+    private fun showDialogMessage(code: Int) {
+//        val builder = AlertDialog.Builder(this)
+//        val dialog = builder.create()
+
+        if(!::dialog.isInitialized) {
+            builder = AlertDialog.Builder(this)
+            dialog = builder.create()
+            dialog.setTitle("Wi-Fi P2P")
+        }
+
+        val message = when(code) {
+            DIALOG_CONNECTING -> {
+                Log.d(TAG, "dialog 1 = $dialog")
+                "P2P 연결 중입니다. 잠시만 기다리세요."
+            }
+            DIALOG_CONNECTING_FAIL -> {
+                Log.d(TAG, "dialog 2 = $dialog")
+                "P2P연결 실패 하였습니다. 다시 연결을 시도 하세요."
+            }
+            else -> ""
+        }
+        dialog.setMessage(message)
+        dialog.show()
     }
 
     private fun moveSubActivity(ip: String) {
@@ -154,10 +178,41 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    var idx = 0
+    private fun peerData(peers: ArrayList<P2pDevice>) {
+        //pList에 peers의 데이터가 없는 경우 추가.
+        for( peer in peers ) {
+            if(!pList.contains(peer)) {
+                pList.add(peer)
+                adapter.notifyItemChanged(idx)
+            }
+            idx++
+        }
 
+        idx = 0
+        //pList에 데이터중에 peers에 없는 데이터는 제거
+        val itr = pList.iterator()
+        while(itr.hasNext()) {
+            val p2p = itr.next()
+            if(!peers.contains(p2p)) {
+                itr.remove()
+                adapter.notifyItemRemoved(idx)
+            }
+            idx++
+        }
+
+        pList.forEach {
+            Log.d(TAG, "=> ${it.name}")
+        }
+
+        Log.d(TAG, "==============================")
+    }
 
     companion object {
         val TAG = MainActivity::class.java.simpleName
         const val PERMISSIONS_REQUEST_CODE = 1001
+
+        private const val DIALOG_CONNECTING = 1 //connecting.
+        private const val DIALOG_CONNECTING_FAIL = 2 //connecting fail.
     }
 }

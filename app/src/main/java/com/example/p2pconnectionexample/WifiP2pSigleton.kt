@@ -18,7 +18,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.example.p2pconnectionexample.SharedPreference.latest_p2p_device
 
-
+data class P2PList(val name: String, val address: String)
 class WifiDirectSingleton() :
     ConnectionInfoListener, Thread() {
     companion object {
@@ -34,6 +34,11 @@ class WifiDirectSingleton() :
         const val P2P_HANDLER_MSG_STATE_CONNECTED = 5 // 상태 메시지 연결됨
         const val P2P_HANDLER_MSG_STATE_DISCONNECT = 6 //연결 종료 하기
         const val P2P_HANDLER_MSG_STATE_DISCONNECTED = 7 // 연결종료완료
+        const val P2P_HANDLER_MSG_STATE_CONNECT_FAIL = 8 // 연결 실패 ( 5초 타임 아웃 )
+
+
+        const val P2P_HANDLER_MSG_STATE_CLEAR = 99 // 모든 핸들러 메세지 삭제.
+
 
         private var instance: WifiDirectSingleton? = null
 
@@ -61,8 +66,8 @@ class WifiDirectSingleton() :
 
     private var ipAddress: String = ""
 
-    data class P2PList(val name: String, val address: String)
-    private var p2plist: ArrayList<P2PList> = ArrayList()
+
+    private var p2plist: ArrayList<P2pDevice> = ArrayList()
 
     init {
         p2pManager = AT3App.context?.getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager?
@@ -84,6 +89,7 @@ class WifiDirectSingleton() :
                     P2P_HANDLER_MSG_GROUP_INFO -> "P2P_HANDLER_MSG_GROUP_INFO"
                     P2P_HANDLER_MSG_DISCOVER_PEERS -> "P2P_HANDLER_MSG_DISCOVER_PEERS"
                     P2P_HANDLER_MSG_STATE_WIFI_OFF -> "P2P_HANDLER_MSG_STATE_WIFI_OFF"
+                    P2P_HANDLER_MSG_STATE_CONNECT_FAIL -> "P2P_HANDLER_MSG_STATE_CONNECT_FAIL"
                     else -> "UNKNOWN"
                 }
 
@@ -96,6 +102,9 @@ class WifiDirectSingleton() :
                     P2P_HANDLER_MSG_CONNECT -> {
                         Log.d(TAG, "P2P_HANDLER_MSG_CONNECT")
                         p2pConnectExec()
+
+                        //연결 시도 후 5초동안 연결 성공을 하지 못하면 FAIL 핸들러 발생
+                        p2pHandler?.sendEmptyMessageDelayed(P2P_HANDLER_MSG_STATE_CONNECT_FAIL, 5000)
                     }
                     P2P_HANDLER_MSG_STATE_CONNECTED ->{
                         Log.d(TAG, "P2P_HANDLER_MSG_STATE_CONNECTED")
@@ -105,6 +114,9 @@ class WifiDirectSingleton() :
                         latest_p2p_device = mDeviceName //현재 연결이 완료된 device 이름 저장.
                         stopDiscoveryPeer()
                         mListener?.onConnected(ipAddress, true, "null")
+
+                        //연결 후 모든 메세지 삭제.
+                        removeMessage(P2P_HANDLER_MSG_STATE_CLEAR)
                     }
                     P2P_HANDLER_MSG_STATE_DISCONNECT -> {
                         Log.d(TAG, "P2P_HANDLER_MSG_STATE_DISCONNECT")
@@ -123,9 +135,14 @@ class WifiDirectSingleton() :
                     P2P_HANDLER_MSG_DISCOVER_PEERS -> {
                         Log.d(TAG, "P2P_HANDLER_MSG_DISCOVER_PEERS")
                         discoveryPeer()
+                        p2pHandler?.sendEmptyMessageDelayed(P2P_HANDLER_MSG_DISCOVER_PEERS, 5000)
                     }
                     P2P_HANDLER_MSG_STATE_WIFI_OFF -> {
                         Log.d(TAG, "P2P_HANDLER_MSG_STATE_WIFI_OFF")
+                    }
+                    P2P_HANDLER_MSG_STATE_CONNECT_FAIL -> {
+                        Log.d(TAG, "P2P_HANDLER_MSG_STATE_CONNECT_FAIL")
+                        mListener?.onConnectFail()
                     }
                     else -> {
                         Log.d(TAG, "UnKnown")
@@ -220,7 +237,7 @@ class WifiDirectSingleton() :
         peerList.deviceList.forEach {
             Log.d(TAG, "List : ${it.deviceName}, ${it.deviceAddress}")
             if(it.deviceName.contains("LOWASIS")) {
-                p2plist.add(P2PList(it.deviceName, it.deviceAddress))
+                p2plist.add(P2pDevice(it.deviceName, it.deviceAddress))
             }
         }
         Log.d(TAG, "......................")
@@ -234,7 +251,7 @@ class WifiDirectSingleton() :
         p2pHandler?.sendEmptyMessage(P2P_HANDLER_MSG_CONNECT)
     }
 
-    fun p2pConnectExec() {
+    private fun p2pConnectExec() {
         val config = WifiP2pConfig.Builder()
             .setNetworkName(mDeviceName)
             .setPassphrase(NETWORK_PASS_PHRASE)
@@ -295,7 +312,6 @@ class WifiDirectSingleton() :
             override fun onFailure(p0: Int) {
                 Log.d(TAG, "P2P 연결 해제 실패!!!")
             }
-
         })
     }
 
@@ -340,6 +356,22 @@ class WifiDirectSingleton() :
         }
     }
 
+    private fun removeMessage(message: Int) {
+        if(message == P2P_HANDLER_MSG_STATE_CLEAR) {
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_CONNECTING)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_CONNECT)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_CONNECTED)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_DISCONNECT)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_DISCONNECTED)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_GROUP_INFO)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_DISCOVER_PEERS)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_WIFI_OFF)
+            p2pHandler?.removeMessages(P2P_HANDLER_MSG_STATE_CONNECT_FAIL)
+        } else {
+            p2pHandler?.removeMessages(message)
+        }
+    }
+
     override fun onConnectionInfoAvailable(p0: WifiP2pInfo?) {
         Log.d(TAG, "onConnectionInfoAvailable()")
     }
@@ -349,9 +381,10 @@ class WifiDirectSingleton() :
         fun onConnecting()
         fun onConnected(ip: String, reachable: Boolean, deviceName: String)
         fun onWifiOff(str: String)
-        fun onDiscoverService(p2plist: ArrayList<P2PList>)
+        fun onDiscoverService(p2plist: ArrayList<P2pDevice>)
         fun onGroupInfo()
         fun onDisconnected()
+        fun onConnectFail()
     }
 
     fun setListener(listener: OnListener) {

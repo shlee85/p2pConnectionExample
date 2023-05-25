@@ -54,7 +54,7 @@ class SubActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
 
-            override fun onDiscoverService(p2plist: ArrayList<WifiDirectSingleton.P2PList>) {
+            override fun onDiscoverService(p2plist: ArrayList<P2pDevice>) {
                 Log.d(TAG, "onDiscoverService")
                 p2plist.forEach {
                     Log.d(TAG, "${it.name} : ${it.address}")
@@ -68,6 +68,10 @@ class SubActivity : AppCompatActivity() {
             override fun onDisconnected() {
                 Log.d(TAG, "onDisconnected!!")
                 goMainActivity()
+            }
+
+            override fun onConnectFail() {
+                TODO("Not yet implemented")
             }
         })
     }
