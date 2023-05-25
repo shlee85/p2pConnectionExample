@@ -126,9 +126,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun p2pListRecyclerView() {
-        binding.p2plistRecyclerview.layoutManager = LinearLayoutManager(AT3App.context)
+        binding.p2plistRecyclerview?.layoutManager = LinearLayoutManager(AT3App.context)
         adapter = P2pListAdapter(AT3App.context!!, pList)
-        binding.p2plistRecyclerview.adapter = adapter
+        binding.p2plistRecyclerview?.adapter = adapter
 
         adapter.setMyItemClickListener(object : P2pListAdapter.MyItemClickListener {
             override fun onItemClick(pos: Int, name: String?) {
