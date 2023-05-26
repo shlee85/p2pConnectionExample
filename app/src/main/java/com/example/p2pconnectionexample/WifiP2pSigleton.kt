@@ -235,7 +235,7 @@ class WifiDirectSingleton() :
         p2plist.clear()   //peerList가 호출 될 때 기존에 쌓은 데이터는 제거 하고 다시 처음부터 쌓는다.
 
         peerList.deviceList.forEach {
-            Log.d(TAG, "List : ${it.deviceName}, ${it.deviceAddress}")
+            //Log.d(TAG, "List : ${it.deviceName}, ${it.deviceAddress}")
             if(it.deviceName.contains("LOWASIS")) {
                 p2plist.add(P2pDevice(it.deviceName, it.deviceAddress))
             }

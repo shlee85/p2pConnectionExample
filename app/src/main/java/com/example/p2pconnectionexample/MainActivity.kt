@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         permissionCheck()
 
+        Log.d(TAG, "onCreate()!!!")
     }
 
     override fun onStart() {
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onStart()!!")
 
         WifiDirectSingleton.setInstance(WifiDirectSingleton())
+
         WifiDirectSingleton.getInstance()?.setListener(object : WifiDirectSingleton.OnListener{
             override fun onConnecting() {
                 TODO("Not yet implemented")
@@ -123,6 +125,10 @@ class MainActivity : AppCompatActivity() {
         WifiDirectSingleton.getInstance()?.p2pStart(false)
 
         p2pListRecyclerView()
+
+
+        WifiDirectSingleton.getInstance()?.p2pDisconnect()
+        Log.d(TAG, "p2pDisconnect 실행.")
     }
 
     private fun p2pListRecyclerView() {
@@ -201,9 +207,9 @@ class MainActivity : AppCompatActivity() {
             idx++
         }
 
-        pList.forEach {
-            Log.d(TAG, "=> ${it.name}")
-        }
+//        pList.forEach {
+//            Log.d(TAG, "=> ${it.name}")
+//        }
 
         Log.d(TAG, "==============================")
     }

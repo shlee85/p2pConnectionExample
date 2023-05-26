@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.example.p2pconnectionexample.databinding.ActivitySubBinding
 import com.google.gson.Gson
 import java.io.ByteArrayInputStream
@@ -56,9 +57,6 @@ class SubActivity : AppCompatActivity() {
 
             override fun onDiscoverService(p2plist: ArrayList<P2pDevice>) {
                 Log.d(TAG, "onDiscoverService")
-                p2plist.forEach {
-                    Log.d(TAG, "${it.name} : ${it.address}")
-                }
             }
 
             override fun onGroupInfo() {
@@ -100,16 +98,20 @@ class SubActivity : AppCompatActivity() {
                         Locale.getDefault()
                     ).format(Date(System.currentTimeMillis()))
                     val strText = "$currentTime  ping:$reachable"
-                    runOnUiThread { binding.pingView.text = strText }
-                    if(!reachable){
-                        pingCount++
-                    } else {
-                        pingCount = 0
-                    }
 
-                    if(pingCount > 5) {
-                        Log.d(TAG, "연결 끊김. 연결을 해제 합니다.")
-                        releaseP2p()
+                    runOnUiThread {
+                        binding.pingView.text = strText
+                        if(!reachable){
+                            pingCount++
+                        } else {
+                            pingCount = 0
+                        }
+
+                        if(pingCount > 5) {
+                            Log.d(TAG, "연결 끊김. 연결을 해제 합니다.")
+                            Toast.makeText(this@SubActivity, "P2P 연결이 해제 되었습니다.", Toast.LENGTH_SHORT).show()
+                            releaseP2p()
+                        }
                     }
 
                     Log.i(TAG, strText)
