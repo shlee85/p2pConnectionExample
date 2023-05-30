@@ -17,36 +17,25 @@
         android:layout_marginBottom="1dp"
         >
 
-        <ImageView
-            android:id="@+id/ic_p2p"
-            android:layout_width="70dp"
-            android:layout_height="47dp"
-            android:background="@drawable/ic_wifi"
-            android:layout_marginLeft="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/mP2pList"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:text="@{model.name}"
             android:textColor="@color/black"
             android:textSize="35sp"
-            android:layout_marginLeft="10dp"
-            app:layout_constraintStart_toEndOf="@id/ic_p2p"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:layout_editor_absoluteX="16dp"
+            android:gravity="center"
             tools:text="123456" />
 
         <ImageView
             android:id="@+id/ic_conn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_connect"
-            android:layout_marginLeft="10dp"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:background="@drawable/ic_connected"
             android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
