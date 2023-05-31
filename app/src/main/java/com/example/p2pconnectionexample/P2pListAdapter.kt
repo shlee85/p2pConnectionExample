@@ -2,6 +2,7 @@ package com.example.p2pconnectionexample
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,12 +32,13 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
             if(item.name == SharedPreference.latest_p2p_device) {
                 Log.d(TAG, "최근에 업데이트한 내용이 있음.[${item.name}]")
                 binding.icConn.visibility = View.VISIBLE
+                binding.mP2pList.setTypeface(null, Typeface.BOLD)
             }
             Log.d(TAG, "item = ${item.name}")
 
             this.itemView.setOnClickListener {
                 Log.d(TAG, "SetOnClick pos = $adapterPosition")
-                this.itemView.setBackgroundColor(Color.parseColor("#aaaaaa"))
+                this.itemView.setBackgroundColor(Color.parseColor("#fbfffb"))
                 mItemClickListener?.onItemClick(adapterPosition, item.name)
             }
         }

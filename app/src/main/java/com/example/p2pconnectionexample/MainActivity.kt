@@ -28,8 +28,9 @@ class MainActivity : AppCompatActivity() {
     private var mDeviceName = ""
 
     private lateinit var adapter: P2pListAdapter
-    //private var pList = arrayListOf<P2pDevice>()
     private var pList = ArrayList<P2pDevice>()
+
+    private var peersCount = 0
 
     private fun permissionCheck() {
         if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -111,6 +112,12 @@ class MainActivity : AppCompatActivity() {
 
 
                 peerData(peers)
+
+                if(peers.size != peersCount) {
+                    peersCount = peers.size
+                    binding.peerCount.text = "$peersCount" + " Networks near of you."
+                }
+                Log.d(TAG, "peersCount = $peersCount")
             }
 
             override fun onGroupInfo() {
@@ -217,8 +224,6 @@ class MainActivity : AppCompatActivity() {
             //dialog 뒷 view touch가능하도록 처리.
             //dialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
         }
-
-        //ialog.setMessage(message)
         dialog.show()
     }
 
