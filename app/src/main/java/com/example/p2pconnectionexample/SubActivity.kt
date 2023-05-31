@@ -1,15 +1,13 @@
 package com.example.p2pconnectionexample
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.example.p2pconnectionexample.databinding.ActivitySubBinding
-import com.google.gson.Gson
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
-import java.io.Serializable
 import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,37 +45,46 @@ class SubActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
 
-            override fun onConnected(ip: String, reachable: Boolean, deviceName: String) {
-                Log.d(TAG, "연결 완료!")
-            }
+            override fun onConnected(ip: String, reachable: Boolean, deviceName: String) {}
 
-            override fun onWifiOff(str: String) {
-                TODO("Not yet implemented")
-            }
+            override fun onWifiOff(str: String) {}
 
-            override fun onDiscoverService(p2plist: ArrayList<P2pDevice>) {
-                Log.d(TAG, "onDiscoverService")
-            }
+            override fun onDiscoverService(p2plist: ArrayList<P2pDevice>) {}
 
-            override fun onGroupInfo() {
-                TODO("Not yet implemented")
-            }
+            override fun onGroupInfo() {}
 
             override fun onDisconnected() {
                 Log.d(TAG, "onDisconnected!!")
-                goMainActivity()
+                moveMainActivity()
+                ActivityCompat.finishAffinity(this@SubActivity)
             }
 
-            override fun onConnectFail() {
-                TODO("Not yet implemented")
-            }
+            override fun onConnectFail() {}
         })
     }
 
-    private fun goMainActivity() {
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy()")
+    }
+
+    private fun moveMainActivity() {
         val intent = Intent(this@SubActivity, MainActivity::class.java)
         intent.putExtra("goMainActivity", "")
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+
+        ActivityCompat.finishAffinity(this@SubActivity)
     }
 
     private fun releaseP2p() {
@@ -120,6 +127,16 @@ class SubActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            Log.d(TAG, "onKeyDown.")
+            releaseP2p()
+            return true
+        }
+
+        return super.onKeyDown(keyCode, event)
     }
 
     companion object {

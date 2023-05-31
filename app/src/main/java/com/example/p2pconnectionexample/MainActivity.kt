@@ -1,25 +1,28 @@
 package com.example.p2pconnectionexample
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
-import android.view.MotionEvent
+import android.view.KeyEvent
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.p2pconnectionexample.databinding.ActivityMainBinding
+import kotlin.system.exitProcess
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ConfirmDialogInterface {
     lateinit var binding: ActivityMainBinding
 
     var p2pList : ArrayList<P2PList> = ArrayList()
@@ -145,7 +148,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun p2pListRecyclerView() {
-        binding.p2plistRecyclerview?.layoutManager = LinearLayoutManager(AT3App.context)
+        Log.d(TAG, "p2pListRecyclerView(). size:${pList.size}")
+        binding.p2plistRecyclerview?.layoutManager = LinearLayoutManager(AT3App.context, LinearLayoutManager.VERTICAL, false)
         adapter = P2pListAdapter(AT3App.context!!, pList)
         binding.p2plistRecyclerview?.adapter = adapter
 
@@ -263,11 +267,34 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "==============================")
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        //백키 이벤트.
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            Log.d(TAG, "KEY_BACK")
+            showPopup("LowaTV를 종료 하시겠습니까?")
+            return true
+        }
+
+        return super.onKeyDown(keyCode, event)
+    }
+
+    private fun showPopup(message: String) {
+        val dialog = ConfirmDialog(this, message)
+        dialog.isCancelable = false
+        dialog.show(this.supportFragmentManager, "ConfirmDialog")
+    }
+
     companion object {
         val TAG = MainActivity::class.java.simpleName
         const val PERMISSIONS_REQUEST_CODE = 1001
 
         private const val DIALOG_CONNECTING = 1 //connecting.
         private const val DIALOG_CONNECTING_FAIL = 2 //connecting fail.
+    }
+
+    override fun onYesButtonClick() {
+        Log.d(TAG, "onYesButtonClick!!!!")
+        ActivityCompat.finishAffinity(this)
+        exitProcess(0)
     }
 }

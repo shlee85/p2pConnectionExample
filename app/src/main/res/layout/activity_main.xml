@@ -52,7 +52,7 @@
         android:id="@+id/peerCount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="5 networks near of you"
+        android:text="Searching...."
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/_15ssp"
@@ -69,7 +69,7 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/peer"
+        android:id="@+id/p2plist_recyclerview"
         tools:listitem="@layout/p2plist_recyclerview_theme"
         android:layout_width="0dp"
         android:layout_height="0dp"

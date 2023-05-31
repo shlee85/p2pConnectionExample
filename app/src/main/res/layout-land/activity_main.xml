@@ -61,7 +61,7 @@
         android:id="@+id/peerCount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="5 networks near of you"
+        android:text="Searching...."
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/_15ssp"

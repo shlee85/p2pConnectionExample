@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -27,14 +26,14 @@
             android:layout_marginBottom="@dimen/_10sdp"
             android:text="@{model.name}"
             android:textColor="@color/black"
-            android:textSize="35sp"
+            android:textSize="@dimen/_13ssp"
             android:gravity="center"
-            tools:text="123456" />
+            tools:text="DIRECT-LOWASIS-5E:86:A2" />
 
         <ImageView
             android:id="@+id/ic_conn"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
             android:background="@drawable/ic_connected"
             android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
