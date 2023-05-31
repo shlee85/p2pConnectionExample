@@ -3,15 +3,21 @@ package com.example.p2pconnectionexample
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.startActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.p2pconnectionexample.databinding.ActivityMainBinding
-import java.io.Serializable
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -146,6 +152,8 @@ class MainActivity : AppCompatActivity() {
                         WifiDirectSingleton.getInstance()?.p2pConnect(p2p.name,p2p.address)
                     }
                 }
+
+                adapter.notifyItemChanged(pos)
             }
         })
     }
@@ -154,27 +162,63 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dialog: AlertDialog
 
     private fun showDialogMessage(code: Int) {
-//        val builder = AlertDialog.Builder(this)
-//        val dialog = builder.create()
-
         if(!::dialog.isInitialized) {
             builder = AlertDialog.Builder(this)
             dialog = builder.create()
-            dialog.setTitle("Wi-Fi P2P")
+//            dialog.setTitle("Wi-Fi P2P")
+
+            val llPadding = 50
+            val ll = LinearLayout(this)
+            ll.orientation = LinearLayout.HORIZONTAL
+            ll.setBackgroundColor(Color.parseColor("#0bc9ec"))
+            ll.setPadding(llPadding, llPadding, llPadding, llPadding)
+            ll.gravity = Gravity.CENTER
+            var llParam = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            llParam.gravity = Gravity.CENTER
+            ll.layoutParams = llParam
+
+            val progressBar = ProgressBar(this)
+            progressBar.isIndeterminate = true
+            progressBar.setPadding(0, 0, llPadding, 0)
+            progressBar.layoutParams = llParam
+
+            llParam = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            llParam.gravity = Gravity.CENTER
+
+            val message = when(code) {
+                DIALOG_CONNECTING -> {
+                    Log.d(TAG, "dialog 1 = $dialog")
+                    "P2P 연결 중입니다. 잠시만 기다리세요."
+                }
+                DIALOG_CONNECTING_FAIL -> {
+                    Log.d(TAG, "dialog 2 = $dialog")
+                    "P2P연결 실패 하였습니다. 다시 연결을 시도 하세요."
+                }
+                else -> ""
+            }
+
+            val tvText = TextView(this)
+            tvText.text = message
+            tvText.setTextColor(Color.parseColor("#ffffff"))
+            tvText.textSize = 20f
+            tvText.layoutParams = llParam
+
+            ll.addView(progressBar)
+            ll.addView(tvText)
+
+            dialog.setView(ll)
+
+            //dialog 뒷 view touch가능하도록 처리.
+            //dialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
         }
 
-        val message = when(code) {
-            DIALOG_CONNECTING -> {
-                Log.d(TAG, "dialog 1 = $dialog")
-                "P2P 연결 중입니다. 잠시만 기다리세요."
-            }
-            DIALOG_CONNECTING_FAIL -> {
-                Log.d(TAG, "dialog 2 = $dialog")
-                "P2P연결 실패 하였습니다. 다시 연결을 시도 하세요."
-            }
-            else -> ""
-        }
-        dialog.setMessage(message)
+        //ialog.setMessage(message)
         dialog.show()
     }
 

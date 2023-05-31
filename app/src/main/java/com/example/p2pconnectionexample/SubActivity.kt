@@ -97,7 +97,7 @@ class SubActivity : AppCompatActivity() {
                         "hh:mm:ss",
                         Locale.getDefault()
                     ).format(Date(System.currentTimeMillis()))
-                    val strText = "$currentTime  ping:$reachable"
+                    val strText = "$currentTime  ping:$reachable ( $ipAddress )"
 
                     runOnUiThread {
                         binding.pingView.text = strText
