@@ -7,46 +7,17 @@
     android:background="@drawable/bg_gradient"
     tools:context=".MainActivity">
 
-    <View
-        android:id="@+id/circle_big"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/antenna"
         android:layout_width="@dimen/_280sdp"
         android:layout_height="@dimen/_280sdp"
-        android:layout_margin="0dp"
-        android:background="@drawable/solid_circle_big"
-        app:layout_constraintBottom_toBottomOf="@+id/antenna"
-        app:layout_constraintEnd_toEndOf="@+id/antenna"
-        app:layout_constraintStart_toStartOf="@+id/antenna"
-        app:layout_constraintTop_toTopOf="@+id/antenna" />
-
-    <View
-        android:id="@+id/circle_middle"
-        android:layout_width="@dimen/_210sdp"
-        android:layout_height="@dimen/_210sdp"
-        android:background="@drawable/solid_circle_middle"
-        app:layout_constraintBottom_toBottomOf="@+id/antenna"
-        app:layout_constraintEnd_toEndOf="@+id/antenna"
-        app:layout_constraintStart_toStartOf="@+id/antenna"
-        app:layout_constraintTop_toTopOf="@+id/antenna" />
-
-    <View
-        android:id="@+id/circle_small"
-        android:layout_width="@dimen/_140sdp"
-        android:layout_height="@dimen/_140sdp"
-        android:background="@drawable/solid_circle_small"
-        app:layout_constraintBottom_toBottomOf="@+id/antenna"
-        app:layout_constraintEnd_toEndOf="@+id/antenna"
-        app:layout_constraintStart_toStartOf="@+id/antenna"
-        app:layout_constraintTop_toTopOf="@+id/antenna" />
-
-    <ImageView
-        android:id="@+id/antenna"
-        android:layout_width="@dimen/_32sdp"
-        android:layout_height="@dimen/_32sdp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/peerCount"
-        app:srcCompat="@drawable/ic_antenna" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/signal_search" />
 
     <TextView
         android:id="@+id/title"
@@ -56,11 +27,26 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/_20ssp"
-        app:layout_constraintBottom_toTopOf="@+id/peerCount"
+
+        app:layout_constraintBottom_toBottomOf="@id/guideline20"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
 
     <TextView
         android:id="@+id/peerCount"
@@ -70,10 +56,10 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="@dimen/_15ssp"
-        app:layout_constraintBottom_toTopOf="@+id/antenna"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@id/guideline30" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
