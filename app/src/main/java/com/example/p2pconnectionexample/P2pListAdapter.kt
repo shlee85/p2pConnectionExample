@@ -15,7 +15,7 @@ data class P2pDevice (val name: String, val address: String)
 class P2pListAdapter(private val context: Context, private val list: ArrayList<P2pDevice>)
     : RecyclerView.Adapter<P2pListAdapter.MainViewHolder>(){
 
-    private lateinit var binding: P2plistRecyclerviewThemeBinding
+   //private lateinit var binding: P2plistRecyclerviewThemeBinding
     private var mItemClickListener: MyItemClickListener ?= null
 
     interface MyItemClickListener{
@@ -26,14 +26,18 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
         this.mItemClickListener = listener
     }
 
-    inner class MainViewHolder(private val binding: P2plistRecyclerviewThemeBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class MainViewHolder(private val binding: P2plistRecyclerviewThemeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(item: P2pDevice) {
-            binding.model = item
+            Log.d(TAG, "ViewHolder!! in Bind()")
+            binding.tvName.text = item.name
             if(item.name == SharedPreference.latest_p2p_device) {
                 Log.d(TAG, "최근에 업데이트한 내용이 있음.[${item.name}]")
                 //binding.icConn.visibility = View.VISIBLE
-                binding.root.setBackgroundColor(Color.argb(0x80, 0xaa, 0xff, 0xfe))
-                binding.mP2pList.setTypeface(null, Typeface.BOLD)
+                //binding.root.setBackgroundColor(Color.argb(0x80, 0xaa, 0xff, 0xfe))
+                binding.tvNameBack.setBackgroundColor(Color.argb(0x80, 0xaa, 0xff, 0xfe))
+                binding.tvName.setTypeface(null, Typeface.BOLD)
+                binding.tvName.setTextColor(Color.WHITE)
             }
             Log.d(TAG, "item = ${item.name}")
 
@@ -47,8 +51,7 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         Log.d(TAG, "onCreateViewHolder()")
-        binding = P2plistRecyclerviewThemeBinding.inflate(LayoutInflater.from(context), parent, false)
-
+        val binding = P2plistRecyclerviewThemeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MainViewHolder(binding)
     }
 
@@ -60,7 +63,7 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
     }
 
     override fun getItemCount(): Int {
-        Log.d(TAG, "getItemCount()")
+        Log.d(TAG, "getItemCount() = ${list.size}")
         return list.size
     }
 

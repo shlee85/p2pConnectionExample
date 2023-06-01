@@ -142,7 +142,6 @@ class MainActivity : AppCompatActivity(), ConfirmDialogInterface {
 
         p2pListRecyclerView()
 
-
         WifiDirectSingleton.getInstance()?.p2pDisconnect()
         Log.d(TAG, "p2pDisconnect 실행.")
     }
