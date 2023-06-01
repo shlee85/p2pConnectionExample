@@ -32,6 +32,7 @@ class P2pListAdapter(private val context: Context, private val list: ArrayList<P
             if(item.name == SharedPreference.latest_p2p_device) {
                 Log.d(TAG, "최근에 업데이트한 내용이 있음.[${item.name}]")
                 //binding.icConn.visibility = View.VISIBLE
+                binding.root.setBackgroundColor(Color.argb(0x80, 0xaa, 0xff, 0xfe))
                 binding.mP2pList.setTypeface(null, Typeface.BOLD)
             }
             Log.d(TAG, "item = ${item.name}")

@@ -26,8 +26,10 @@
             android:layout_marginBottom="@dimen/_10sdp"
             android:text="@{model.name}"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp"
             android:gravity="center"
+            android:autoSizeMinTextSize="@dimen/_10ssp"
+            android:autoSizeMaxTextSize="@dimen/_13ssp"
+            android:autoSizeTextType="uniform"
             tools:text="DIRECT-LOWASIS-5E:86:A2" />
 
         <ImageView
